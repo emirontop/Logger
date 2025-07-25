@@ -2,12 +2,17 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import links from "../../data/links.json";
 
+type LinksType = {
+  [key: string]: string;
+};
+
 export default function Redirect() {
   const { query } = useRouter();
 
   useEffect(() => {
     if (typeof query.id === "string") {
-      const url = links[query.id];
+      const typedLinks = links as LinksType;  // Burada tip ataması yapıyoruz
+      const url = typedLinks[query.id];
       if (url) location.href = url;
     }
   }, [query.id]);
