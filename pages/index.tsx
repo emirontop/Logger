@@ -1,36 +1,31 @@
 import { useState } from "react";
-import links from "../data/links.json";
 
 export default function Home() {
+  const [id, setId] = useState("");
   const [url, setUrl] = useState("");
-  const [newId, setNewId] = useState("");
+  const [msg, setMsg] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const id = Math.random().toString(36).substring(2, 8);
-    alert(`GitHub'daki data/links.json dosyasına şunu ekle:\n\n"${id}": "${url}"`);
-    setNewId(id);
+  const handleAdd = async () => {
+    const res = await fetch("/api/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, url }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setMsg(`✅ Eklendi: /l/${id}`);
+    } else {
+      setMsg(`❌ Hata: ${data.error}`);
+    }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>🔗 Link Kısaltıcı</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="https://ornek.com"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          style={{ width: "300px", padding: "0.5rem" }}
-        />
-        <button type="submit" style={{ marginLeft: "1rem" }}>
-          Kısalt
-        </button>
-      </form>
-      {newId && (
-        <p style={{ marginTop: "1rem" }}>
-          Kısa Link: <a href={`/l/${newId}`}>{window.location.origin}/l/{newId}</a>
-        </p>
-      )}
-    </div>
+    <main style={{ padding: 40 }}>
+      <h1>Logger</h1>
+      <input placeholder="ID" value={id} onChange={(e) => setId(e.target.value)} />
+      <input placeholder="URL" value={url} onChange={(e) => setUrl(e.target.value)} />
+      <button onClick={handleAdd}>Ekle</button>
+      <p>{msg}</p>
+    </main>
   );
 }
