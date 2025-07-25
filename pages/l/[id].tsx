@@ -12,7 +12,7 @@ export default function Redirect() {
   useEffect(() => {
     if (typeof query.id === "string") {
       const typedLinks = links as LinksType;  // Burada tip ataması yapıyoruz
-      const url = typedLinks[query.id];
+      const url = (links as Record<string, string>)[query.id];
       if (url) location.href = url;
     }
   }, [query.id]);
