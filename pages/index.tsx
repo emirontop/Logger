@@ -4,33 +4,40 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [newId, setNewId] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setNewId("");
+    setLoading(true);
 
-    // 1. Rastgele ID üret
-    const id = Math.random().toString(36).substring(2, 8);
+    try {
+      const id = Math.random().toString(36).substring(2, 8);
 
-    // 2. API'yi çağır, linki ekle
-    const res = await fetch("/api/add-link", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, url }),
-    });
+      const res = await fetch("/api/add-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, url }),
+      });
 
-    if (!res.ok) {
-      const { error } = await res.json();
-      setError(error || "Bilinmeyen hata");
-      return;
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "⚠️ Bilinmeyen bir hata oluştu.");
+        return;
+      }
+
+      setNewId(id);
+    } catch (err) {
+      setError("🚫 Sunucuya bağlanırken hata oluştu.");
+    } finally {
+      setLoading(false);
     }
-
-    // 3. Başarılıysa yeni ID ile state'i güncelle
-    setNewId(id);
   };
 
   return (
-    <main style={{ padding: 24, fontFamily: "sans-serif" }}>
+    <main style={{ padding: 24, fontFamily: "sans-serif", maxWidth: 600 }}>
       <h1>📝 Logger — Link Oluştur</h1>
 
       <form onSubmit={handleCreate} style={{ marginBottom: 16 }}>
@@ -42,16 +49,20 @@ export default function Home() {
           onChange={(e) => setUrl(e.target.value)}
           style={{
             padding: "0.5rem",
-            width: "300px",
+            width: "100%",
+            maxWidth: "400px",
             marginRight: "1rem",
             border: "1px solid #ccc",
             borderRadius: 4,
+            marginBottom: 8,
           }}
         />
+        <br />
         <button
           type="submit"
+          disabled={loading}
           style={{
-            padding: "0.5rem 1rem",
+            padding: "0.5rem 1.2rem",
             border: "none",
             background: "#0070f3",
             color: "#fff",
@@ -59,35 +70,48 @@ export default function Home() {
             cursor: "pointer",
           }}
         >
-          Oluştur
+          {loading ? "Oluşturuluyor..." : "Oluştur"}
         </button>
       </form>
 
       {error && (
-        <p style={{ color: "red", marginBottom: 16 }}>❌ {error}</p>
+        <div
+          style={{
+            backgroundColor: "#ffe5e5",
+            padding: "10px 14px",
+            borderRadius: 6,
+            color: "#d00",
+            border: "1px solid #f99",
+            marginBottom: 16,
+          }}
+        >
+          ❌ {error}
+        </div>
       )}
 
       {newId && (
-        <div style={{ lineHeight: 1.6 }}>
-          <p>✅ Link oluşturuldu:</p>
-          <a
-            href={`/l/${newId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {window.location.origin}/l/{newId}
-          </a>
-          <p style={{ marginTop: 8 }}>
-            Statistikleri görmek için:
-            {" "}
-            <a
-              href={`/stats/${newId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {window.location.origin}/stats/{newId}
+        <div
+          style={{
+            backgroundColor: "#e6f7ff",
+            padding: "10px 14px",
+            borderRadius: 6,
+            border: "1px solid #99d",
+            color: "#036",
+          }}
+        >
+          ✅ Link oluşturuldu:<br />
+          <strong>
+            <a href={`/l/${newId}`} target="_blank" rel="noopener noreferrer">
+              {typeof window !== "undefined" ? window.location.origin : ""}/l/{newId}
             </a>
-          </p>
+          </strong>
+          <br />
+          İstatistikler:{" "}
+          <strong>
+            <a href={`/stats/${newId}`} target="_blank" rel="noopener noreferrer">
+              {typeof window !== "undefined" ? window.location.origin : ""}/stats/{newId}
+            </a>
+          </strong>
         </div>
       )}
     </main>
