@@ -22,7 +22,9 @@ export default function Home() {
           onChange={(e) => setUrl(e.target.value)}
           style={{ width: "300px", padding: "0.5rem" }}
         />
-        <button type="submit" style={{ marginLeft: "1rem" }}>Kısalt</button>
+        <button type="submit" style={{ marginLeft: "1rem" }}>
+          Kısalt
+        </button>
       </form>
       {newId && (
         <p style={{ marginTop: "1rem" }}>
@@ -30,6 +32,5 @@ export default function Home() {
         </p>
       )}
     </div>
-);
-          }
-            
+  );
+}
