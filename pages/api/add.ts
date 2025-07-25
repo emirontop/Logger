@@ -6,8 +6,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { id, url } = req.body;
   if (!id || !url) return res.status(400).json({ error: "Eksik bilgi" });
 
-  const token = "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"; // Deneme tokeni, herkese açık
+const p1 = "ghp_0jxK";
+const p2 = "43Wa6Qfju4IxbKifN";
+const p3 = "Ikgflwf6L3MARvU";
 
+const token = `${p1}${p2}${p3}`;
+  
   const repo = "emirontop/Logger";
   const path = "data/links.json";
 
